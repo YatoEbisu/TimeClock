@@ -3,12 +3,17 @@
     <v-app-bar app color="gray" flat elevation="1">
       <v-container class="py-0 fill-height">
         <v-avatar class="mr-10" color="grey darken-1" size="32">
-              <v-img :src="img" contain class="img-b" />
+          <v-img :src="img" contain class="img-b" />
         </v-avatar>
-        <span class="text">Time Clock</span>
+        <v-btn  text>
+          Punch a Clock
+        </v-btn>
+
+          <v-btn  text>
+          Appointed hours
+        </v-btn>
 
         <v-spacer></v-spacer>
-
       </v-container>
     </v-app-bar>
 
@@ -29,7 +34,7 @@ export default {
   },
 
   data: () => ({
-    img: require("./assets/avatar.png")
+    img: require("./assets/avatar.png"),
   }),
 };
 </script>

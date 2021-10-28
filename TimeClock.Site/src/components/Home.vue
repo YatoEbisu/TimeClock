@@ -1,33 +1,7 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="2">
-        <v-sheet rounded="lg">
-          <v-list color="transparent">
-            <v-list-item link @click="seen = false">
-              <v-list-item-content>
-                <v-list-item-title> Punch a clock </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <div class="line"></div>
-            <v-list-item link @click="seen = true">
-              <v-list-item-content>
-                <v-list-item-title> Appointed hours </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-divider class="my-2"></v-divider>
-
-            <v-list-item link color="grey lighten-4">
-              <v-list-item-content>
-                <v-list-item-title> Refresh </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-sheet>
-      </v-col>
-
-      <v-col cols="10">
+    <v-row class="justify-center">
+      <v-col cols="10" class="">
         <v-sheet
           min-height="50vh"
           rounded="lg"
@@ -47,6 +21,7 @@
                     solo
                     label="Date"
                     disabled
+                    shaped
                     class="zindex-1"
                     v-model="date"
                   ></v-text-field>
@@ -62,6 +37,7 @@
                     solo
                     label="Entry Time"
                     disabled
+                    shaped
                     class="zindex-1"
                     v-model="entryTime"
                   ></v-text-field>
@@ -82,6 +58,7 @@
                     label="Exit Time"
                     elevation="2"
                     disabled
+                    shaped
                     class="zindex-1"
                     v-model="exitTime"
                   ></v-text-field>
@@ -111,7 +88,9 @@
               </v-row>
             </v-col>
             <v-col cols="6">
-              <v-img :src="img" contain class="img-b" />
+              <div class="div-img">
+                <v-img :src="img" contain class="img-b" />
+              </div>
             </v-col>
           </v-row>
         </v-sheet>
@@ -201,12 +180,14 @@
       <v-card>
         <v-card-title class="text-h5">
           Are you sure you want to delete this item?
-        </v-card-title
-        >
+        </v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialogDelete = false">Cancel</v-btn>
-          <v-btn color="red darken-1" text @click="Delete(itemDeleteId)">Delete</v-btn
+          <v-btn color="blue darken-1" text @click="dialogDelete = false"
+            >Cancel</v-btn
+          >
+          <v-btn color="red darken-1" text @click="Delete(itemDeleteId)"
+            >Delete</v-btn
           >
           <v-spacer></v-spacer>
         </v-card-actions>
@@ -218,9 +199,9 @@
       :color="snackbar.color"
       absolute
       right
-      shaped
       top
     >
+      <v-icon dark left>{{ snackbar.icon }}</v-icon>
       {{ snackbar.text }}
     </v-snackbar>
   </v-container>
@@ -248,6 +229,7 @@ export default {
       text: "",
       timeout: 2000,
       color: "",
+      icon: ""
     },
     itemDeleteId: null,
     img: require("../assets/img-dev.png"),
@@ -300,17 +282,17 @@ export default {
           .then((response) => {
             console.log(response);
             if (response.status == 201) {
-              this.ShowSnackbar("successfully created", "success");
+              this.ShowSnackbar("successfully created", "success", "mdi-chevron-down-circle");
               this.ClearFields();
               this.Get();
             }
           })
           .catch((error) => {
-            this.ShowSnackbar("failed to create", "red");
+            this.ShowSnackbar("failed to create", "red", "mdi-close-circle");
             console.error(error);
           });
       else {
-        this.ShowSnackbar("All fields are required", "warning");
+        this.ShowSnackbar("All fields are required", "warning", "mdi-alert-circle");
       }
     },
     DeleteConfirm(id) {
@@ -318,25 +300,26 @@ export default {
       this.dialogDelete = true;
     },
     Delete(id) {
-      console.log('entrou delete');
+      console.log("entrou delete");
       this.itemDeleteId = null;
       this.dialogDelete = false;
       axios
         .delete(ENDPOINT_API + `/id:guid?id=${id}`)
         .then((response) => {
-        console.log(response.status);
-        if (response.status == 200) {
-          console.log('deletou');
-          this.ShowSnackbar("Successfully deleted item", "success");
-          this.Get();
-        }
-      })
-       .catch((error) => {
-            this.ShowSnackbar("failed to deleted item", "red");
-            console.error(error);
-          });
+          console.log(response.status);
+          if (response.status == 200) {
+            console.log("deletou");
+            this.ShowSnackbar("Successfully deleted item", "success", "mdi-alert-circle");
+            this.Get();
+          }
+        })
+        .catch((error) => {
+          this.ShowSnackbar("failed to deleted item", "red", "mdi-close-circle");
+          console.error(error);
+        });
     },
-    ShowSnackbar(msg, color) {
+    ShowSnackbar(msg, color, icon) {
+      this.snackbar.icon = icon;
       this.snackbar.text = msg;
       this.snackbar.color = color;
       this.snackbar.show = true;
@@ -388,5 +371,9 @@ export default {
 }
 .text-white {
   color: white;
+}
+.div-img {
+  display: grid;
+  place-items: center;
 }
 </style>
