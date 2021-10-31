@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using TimeClock.API.DTOs;
 
@@ -12,5 +13,6 @@ namespace TimeClock.API.Interfaces
         Task Delete(Guid id);
         Task<ResponseTimeClockDTO> Get(Guid id);
         Task<List<ResponseTimeClockDTO>> Get();
+        Task<MemoryStream> Export(DateTime start, DateTime end);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using TimeClock.API.DTOs;
 using TimeClock.API.Interfaces;
@@ -17,7 +18,7 @@ namespace TimeClock.API.Controllers
         {
             _service = service;
         }
-
+        [DisableCors]
         [HttpGet]
         public async Task<IActionResult> Get() => Ok(await _service.Get());
        
@@ -30,6 +31,14 @@ namespace TimeClock.API.Controllers
             if(timeClockDTO == null) return NotFound();
             await _service.Add(timeClockDTO);
             return Created(nameof(Create), timeClockDTO);
+        }
+
+        [HttpPost("Export")]
+        public async Task<IActionResult> Export(ExportDTO exportDTO)
+        {
+            var memory = await _service.Export(exportDTO.StartDate, exportDTO.EndDate);
+            if(memory == null) return NoContent();
+            return File(memory.ToArray(), "text/csv", $"{exportDTO.StartDate} - {exportDTO.EndDate}.csv");
         }
 
         [HttpPut]

@@ -8,6 +8,9 @@ using FluentValidation;
 using TimeClock.API.Entities.Validator;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Globalization;
+using CsvHelper;
 
 namespace TimeClock.API.Services
 {
@@ -50,10 +53,37 @@ namespace TimeClock.API.Services
         public async Task<List<ResponseTimeClockDTO>> Get() =>
             _mapper.Map<List<ResponseTimeClockDTO>>(await _repository.FindAsync(p => true)).Select(i =>
             {
-                i._pointDate = i.PointDate.ToString("dd-MM-yyyy");
+                i._pointDate = i.PointDate.ToString("yyyy-MM-dd");
                 return i;
             }).ToList();
 
+        public async Task<MemoryStream> Export(DateTime start, DateTime end)
+        {
+            var response = await _repository.FindAsync(p => p.PointDate >= start && p.PointDate <= end);
+
+            if(response.Count()  == 0)
+                return null;
+
+            var lunch = new TimeSpan(0, 1, 0);
+            var list = response.Select(i => {
+                return new
+                {
+                    Date = i.PointDate,
+                    Entry_Time = i.EntryTime,
+                    Exit_Time = i.ExitTime,
+                    Worked_Time = (i.ExitTime - i.EntryTime).Subtract(lunch),
+                };
+
+            });
+            await using var memory = new MemoryStream();
+            await using var stw = new StreamWriter(memory);
+            await using var csv = new CsvWriter(stw, CultureInfo.InvariantCulture);
+            await csv.WriteRecordsAsync(list);
+
+            await csv.FlushAsync();
+            await stw.FlushAsync();
+            return memory;
+        }
         private void Validate(Entities.TimeClock obj, AbstractValidator<Entities.TimeClock> validator)
         {
             if (obj == null)

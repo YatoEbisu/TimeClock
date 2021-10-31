@@ -39,11 +39,9 @@ namespace TimeClock.API
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                                   builder =>
                                   {
-                                      builder.WithOrigins("localhost:8080",
-                                                          "http://192.168.3.6:8080")
-                                                        .AllowAnyHeader()
-                                                        .AllowAnyMethod()
-                                                        .WithMethods("POST", "PUT", "DELETE", "GET");
+                                      builder.AllowAnyOrigin()
+                                             .AllowAnyHeader()
+                                             .AllowAnyMethod();
                                   });
             });
             services.AddControllers();
@@ -63,9 +61,9 @@ namespace TimeClock.API
         {
             //if (env.IsDevelopment())
             //{
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeClock.API v1"));
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeClock.API v1"));
             //}
 
             app.UseRouting();
